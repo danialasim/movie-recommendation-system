@@ -1,0 +1,43 @@
+{
+  "dataset": "ml-100k",
+  "evaluation_timestamp": "2025-08-16 06:28:36",
+  "models_evaluated": [
+    "sae"
+  ],
+  "sae": {
+    "rmse": 0.9009172320365906,
+    "mae": 0.7527998089790344,
+    "r2_score": 0.11202234029769897,
+    "mean_prediction": 0.6269839406013489,
+    "mean_actual": 0.6748982071876526,
+    "num_test_ratings": 18415,
+    "precision_at_5": 0.0,
+    "ndcg_at_5": 0.20539823382539457,
+    "precision_at_10": 0.0,
+    "ndcg_at_10": 0.22956659430593176,
+    "precision_at_20": 0.0,
+    "ndcg_at_20": 0.24759869294827933,
+    "catalog_coverage": 0.5945303210463734,
+    "users_evaluated": 943,
+    "rmse_normalized": 0.22522930800914764,
+    "mae_normalized": 0.1881999522447586,
+    "std_prediction": 0.08113960176706314,
+    "std_actual": 0.23902079463005066,
+    "model_type": "SAE",
+    "architecture": "1682 \u2192 37 \u2192 17 \u2192 1682",
+    "total_parameters": 127499,
+    "hyperparameters": {
+      "learning_rate": 0.005581446578200544,
+      "weight_decay": 1.21133940108629e-06,
+      "dropout_rate": 0.20166174075292953,
+      "batch_size": 64,
+      "activation": "relu",
+      "hidden_dims": [
+        37,
+        17
+      ],
+      "n_movies": 1682,
+      "model_type": "stacked_autoencoder"
+    }
+  }
+}
