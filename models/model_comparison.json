@@ -1,0 +1,23 @@
+{
+  "SAE": {
+    "metrics": {
+      "rmse": 0.9359930753707886,
+      "mae": 0.7579308748245239,
+      "r2_score": 0.015031754970550537,
+      "mean_prediction": 3.6234965324401855,
+      "mean_actual": 3.702455759048462,
+      "num_test_ratings": 18488
+    },
+    "parameters": 124245,
+    "model_size_mb": 0.4739570617675781
+  },
+  "RBM": {
+    "metrics": {
+      "reconstruction_error": 0.69537912607193,
+      "average_free_energy": -105.95444030761719,
+      "num_samples": 943
+    },
+    "parameters": 260864,
+    "model_size_mb": 50.784297943115234
+  }
+}

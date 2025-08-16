@@ -1,0 +1,24 @@
+{
+  "model_type": "RBM",
+  "architecture": {
+    "visible_units": 1682,
+    "hidden_units": 154,
+    "cd_k": 5
+  },
+  "training_params": {
+    "learning_rate": 0.001697529971184091,
+    "n_hidden": 154,
+    "cd_k": 5,
+    "batch_size": 100,
+    "l2_penalty": 2.911402261499336e-06,
+    "n_movies": 1682,
+    "model_type": "restricted_boltzmann_machine"
+  },
+  "final_metrics": {
+    "reconstruction_error": 0.69537912607193,
+    "average_free_energy": -105.95444030761719,
+    "num_samples": 943
+  },
+  "model_path": "final_model.pt",
+  "training_completed": "2025-08-16 06:32:22"
+}

@@ -1,0 +1,13 @@
+{
+  "learning_rate": 0.003169858136149111,
+  "weight_decay": 1.5277178469850012e-06,
+  "dropout_rate": 0.16536822590187028,
+  "batch_size": 64,
+  "activation": "relu",
+  "hidden_dims": [
+    50,
+    16
+  ],
+  "n_movies": 1682,
+  "model_type": "stacked_autoencoder"
+}
