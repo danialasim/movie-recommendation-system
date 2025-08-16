@@ -1,0 +1,60 @@
+groups:
+  - name: movie-recommendation-alerts
+    rules:
+      # API Health Alerts
+      - alert: APIDown
+        expr: up{job="movie-recommendation-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Movie Recommendation API is down"
+          description: "The Movie Recommendation API has been down for more than 1 minute."
+
+      - alert: HighErrorRate
+        expr: rate(api_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors per second for the last 5 minutes."
+
+      # Response Time Alerts
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(api_request_duration_seconds_bucket[5m])) > 2
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API response time"
+          description: "95th percentile response time is {{ $value }}s for the last 5 minutes."
+
+      # Model Performance Alerts
+      - alert: ModelPredictionFailures
+        expr: rate(model_predictions_total{status="error"}[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Model prediction failures detected"
+          description: "Model {{ $labels.model_type }} is failing at {{ $value }} predictions per second."
+
+      - alert: LowRecommendationConfidence
+        expr: histogram_quantile(0.5, rate(recommendation_confidence_bucket[10m])) < 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low recommendation confidence"
+          description: "Median recommendation confidence is {{ $value }}, indicating poor model performance."
+
+      # Model Availability Alerts
+      - alert: ModelUnavailable
+        expr: active_models == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Model unavailable"
+          description: "Model {{ $labels.model_type }} is not active."

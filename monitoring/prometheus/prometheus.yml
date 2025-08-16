@@ -1,0 +1,63 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'movie-rec-monitor'
+
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Movie Recommendation API metrics (local host)
+  - job_name: 'movie-recommendation-api'
+    static_configs:
+      - targets: ['192.168.1.8:8001']  # Host IP address
+    metrics_path: /metrics
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    honor_labels: true
+
+  # Additional metrics endpoint on port 8002
+  - job_name: 'movie-rec-metrics'
+    static_configs:
+      - targets: ['192.168.1.8:8002']  # Dedicated metrics port
+    metrics_path: /metrics
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    honor_labels: true
+
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 30s
+
+  # Node Exporter for system metrics (only if running)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s
+    honor_labels: true
+
+  # Grafana metrics
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # AlertManager
+  - job_name: 'alertmanager'
+    static_configs:
+      - targets: ['alertmanager:9093']
+    scrape_interval: 30s
+
+# Remote write configuration (optional - for long-term storage)
+# remote_write:
+#   - url: "http://your-remote-storage/api/v1/write"
