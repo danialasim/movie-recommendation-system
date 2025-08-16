@@ -1,0 +1,474 @@
+{% extends "base.html" %}
+
+{% block title %}MovieRec AI - Smart Movie Recommendations{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-lg-12 text-center">
+            <div class="hero-section">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-magic text-primary me-3"></i>
+                    Discover Your Next Favorite Movie
+                </h1>
+                <p class="lead mb-4">
+                    Powered by advanced AI models (SAE & RBM) to give you personalized movie recommendations
+                </p>
+                
+                <!-- Model Status Cards -->
+                <div class="row justify-content-center mb-4">
+                    <div class="col-md-3">
+                        <div class="card model-status-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-brain fa-2x mb-2 {% if model_info.sae_available %}text-success{% else %}text-muted{% endif %}"></i>
+                                <h6>SAE Model</h6>
+                                <span class="badge {% if model_info.sae_available %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {% if model_info.sae_available %}Ready{% else %}Unavailable{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card model-status-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-network-wired fa-2x mb-2 {% if model_info.rbm_available %}text-success{% else %}text-muted{% endif %}"></i>
+                                <h6>RBM Model</h6>
+                                <span class="badge {% if model_info.rbm_available %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {% if model_info.rbm_available %}Ready{% else %}Unavailable{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendation Section -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card recommendation-card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-search me-2"></i>
+                        Get Personalized Recommendations
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Model Selection -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Choose AI Model:</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="modelType" id="saeModel" value="sae" checked>
+                            <label class="btn btn-outline-primary" for="saeModel">
+                                <i class="fas fa-brain me-1"></i>SAE (Stacked AutoEncoder)
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="modelType" id="rbmModel" value="rbm">
+                            <label class="btn btn-outline-primary" for="rbmModel">
+                                <i class="fas fa-network-wired me-1"></i>RBM (Restricted Boltzmann Machine)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Movie Search -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Tell us what movies you like:</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-film"></i>
+                            </span>
+                            <input type="text" class="form-control" id="movieSearch" 
+                                   placeholder="Search for movies you enjoyed..." autocomplete="off">
+                        </div>
+                        <div id="movieSearchResults" class="movie-search-results"></div>
+                    </div>
+
+                    <!-- Selected Movies -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Your Selected Movies:</label>
+                        <div id="selectedMovies" class="selected-movies">
+                            <div class="empty-state text-muted text-center py-3">
+                                <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                                <p>Search and add movies you like to get started</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Number of Recommendations -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Number of recommendations:</label>
+                        <select class="form-select" id="numRecommendations">
+                            <option value="5">5 movies</option>
+                            <option value="10" selected>10 movies</option>
+                            <option value="15">15 movies</option>
+                            <option value="20">20 movies</option>
+                        </select>
+                    </div>
+
+                    <!-- Get Recommendations Button -->
+                    <div class="text-center">
+                        <button class="btn btn-primary btn-lg" onclick="getRecommendations()" id="getRecommendationsBtn">
+                            <i class="fas fa-magic me-2"></i>
+                            Get AI Recommendations
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations Results -->
+    <div class="row mt-5" id="recommendationsSection" style="display: none;">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-star me-2"></i>
+                        Your Personalized Recommendations
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div id="recommendationsResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Start Section -->
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-rocket me-2"></i>
+                        Quick Start: Popular Movies
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Click on any movie below to add it to your preferences:</p>
+                    <div class="row">
+                        {% for movie in popular_movies[:20] %}
+                        <div class="col-md-6 col-lg-4 mb-2">
+                            <button class="btn btn-outline-secondary btn-sm w-100 popular-movie-btn" 
+                                    onclick="addMovieFromPopular('{{ movie.title }}', {{ movie.movie_id }})">
+                                <i class="fas fa-film me-1"></i>{{ movie.title }}
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Global variables
+let selectedMovies = [];
+let searchTimeout;
+
+// Initialize page
+$(document).ready(function() {
+    console.log('MovieRec AI initialized');
+    
+    // Movie search functionality
+    $('#movieSearch').on('input', function() {
+        clearTimeout(searchTimeout);
+        const query = $(this).val().trim();
+        
+        if (query.length >= 2) {
+            searchTimeout = setTimeout(() => searchMovies(query), 300);
+        } else {
+            $('#movieSearchResults').empty();
+        }
+    });
+    
+    // Hide search results when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#movieSearch, #movieSearchResults').length) {
+            $('#movieSearchResults').empty();
+        }
+    });
+});
+
+// Search movies
+function searchMovies(query) {
+    if (query.length < 2) return;
+    
+    $.get('/movie-search', { q: query })
+        .done(function(movies) {
+            displaySearchResults(movies);
+        })
+        .fail(function() {
+            console.error('Failed to search movies');
+        });
+}
+
+// Display search results
+function displaySearchResults(movies) {
+    const resultsDiv = $('#movieSearchResults');
+    resultsDiv.empty();
+    
+    if (movies.length === 0) {
+        resultsDiv.html('<div class="search-result-item text-muted">No movies found</div>');
+        return;
+    }
+    
+    movies.forEach(movie => {
+        const isSelected = selectedMovies.some(m => m.id === movie.id);
+        const resultItem = $(`
+            <div class="search-result-item ${isSelected ? 'selected' : ''}" 
+                 onclick="addMovie(${movie.id}, '${movie.title.replace(/'/g, "\\'")}')">
+                <i class="fas fa-film me-2"></i>${movie.title}
+                ${isSelected ? '<i class="fas fa-check ms-auto text-success"></i>' : ''}
+            </div>
+        `);
+        resultsDiv.append(resultItem);
+    });
+}
+
+// Add movie to selection
+function addMovie(movieId, movieTitle) {
+    // Check if already selected
+    if (selectedMovies.some(m => m.id === movieId)) {
+        return;
+    }
+    
+    selectedMovies.push({ id: movieId, title: movieTitle });
+    updateSelectedMoviesDisplay();
+    $('#movieSearchResults').empty();
+    $('#movieSearch').val('');
+}
+
+// Add movie from popular movies
+function addMovieFromPopular(movieTitle, movieId) {
+    addMovie(movieId, movieTitle);
+}
+
+// Remove movie from selection
+function removeMovie(movieId) {
+    selectedMovies = selectedMovies.filter(m => m.id !== movieId);
+    updateSelectedMoviesDisplay();
+}
+
+// Update selected movies display
+function updateSelectedMoviesDisplay() {
+    const container = $('#selectedMovies');
+    container.empty();
+    
+    if (selectedMovies.length === 0) {
+        container.html(`
+            <div class="empty-state text-muted text-center py-3">
+                <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                <p>Search and add movies you like to get started</p>
+            </div>
+        `);
+        return;
+    }
+    
+    selectedMovies.forEach(movie => {
+        const movieTag = $(`
+            <span class="movie-tag">
+                <i class="fas fa-film me-1"></i>${movie.title}
+                <button class="btn-close ms-2" onclick="removeMovie(${movie.id})"></button>
+            </span>
+        `);
+        container.append(movieTag);
+    });
+}
+
+// Get recommendations
+function getRecommendations() {
+    if (selectedMovies.length === 0) {
+        alert('Please select at least one movie you like!');
+        return;
+    }
+    
+    const modelType = $('input[name="modelType"]:checked').val();
+    const numRecommendations = parseInt($('#numRecommendations').val());
+    
+    // Show loading
+    $('#loadingOverlay').removeClass('d-none');
+    $('#getRecommendationsBtn').prop('disabled', true);
+    
+    const requestData = {
+        liked_movies: selectedMovies.map(m => m.id),
+        model_type: modelType,
+        num_recommendations: numRecommendations
+    };
+    
+    $.ajax({
+        url: '/recommend',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(requestData),
+        success: function(response) {
+            if (response.success) {
+                displayRecommendations(response.recommendations, response.model_used);
+            } else {
+                alert('Error: ' + response.error);
+            }
+        },
+        error: function() {
+            alert('Failed to get recommendations. Please try again.');
+        },
+        complete: function() {
+            $('#loadingOverlay').addClass('d-none');
+            $('#getRecommendationsBtn').prop('disabled', false);
+        }
+    });
+}
+
+// Display recommendations
+function displayRecommendations(recommendations, modelUsed) {
+    const resultsDiv = $('#recommendationsResults');
+    resultsDiv.empty();
+    
+    if (recommendations.length === 0) {
+        resultsDiv.html('<p class="text-muted">No recommendations found.</p>');
+        return;
+    }
+    
+    // Model info
+    const modelIcon = modelUsed === 'sae' ? 'fas fa-brain' : 'fas fa-network-wired';
+    const modelName = modelUsed === 'sae' ? 'Stacked AutoEncoder' : 'Restricted Boltzmann Machine';
+    
+    resultsDiv.append(`
+        <div class="alert alert-info">
+            <i class="${modelIcon} me-2"></i>
+            Generated using <strong>${modelName}</strong> model
+        </div>
+    `);
+    
+    // Recommendations grid
+    const recommendationsGrid = $('<div class="row"></div>');
+    
+    recommendations.forEach((movie, index) => {
+        const movieCard = $(`
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card movie-recommendation-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title">${movie.title}</h6>
+                            <span class="rank-badge">#${index + 1}</span>
+                        </div>
+                        <div class="movie-rating mb-2">
+                            <span class="stars">${'★'.repeat(Math.round(movie.rating))}</span>
+                            <span class="score ms-1">${movie.rating}/5</span>
+                        </div>
+                        <small class="text-muted">Confidence: ${Math.round(movie.confidence * 100)}%</small>
+                    </div>
+                </div>
+            </div>
+        `);
+        recommendationsGrid.append(movieCard);
+    });
+    
+    resultsDiv.append(recommendationsGrid);
+    
+    // Show results section
+    $('#recommendationsSection').show();
+    $('html, body').animate({
+        scrollTop: $('#recommendationsSection').offset().top - 100
+    }, 500);
+}
+
+// Show model info
+function showModelInfo() {
+    $.get('/model-info')
+        .done(function(info) {
+            let modalContent = '<div class="model-info-content">';
+            
+            // SAE Model Info
+            modalContent += `
+                <h5><i class="fas fa-brain me-2"></i>Stacked AutoEncoder (SAE)</h5>
+                <p><strong>Status:</strong> ${info.sae_model.available ? '<span class="text-success">Available</span>' : '<span class="text-danger">Not Available</span>'}</p>
+            `;
+            
+            if (info.sae_model.available && info.sae_model.architecture) {
+                modalContent += `<p><strong>Architecture:</strong> ${info.sae_model.architecture}</p>`;
+            }
+            
+            modalContent += '<hr>';
+            
+            // RBM Model Info
+            modalContent += `
+                <h5><i class="fas fa-network-wired me-2"></i>Restricted Boltzmann Machine (RBM)</h5>
+                <p><strong>Status:</strong> ${info.rbm_model.available ? '<span class="text-success">Available</span>' : '<span class="text-danger">Not Available</span>'}</p>
+            `;
+            
+            if (info.rbm_model.available && info.rbm_model.architecture) {
+                modalContent += `<p><strong>Architecture:</strong> ${info.rbm_model.architecture}</p>`;
+            }
+            
+            modalContent += '</div>';
+            
+            // Create and show modal
+            const modal = $(`
+                <div class="modal fade" id="modelInfoModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Model Information</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                ${modalContent}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            
+            $('body').append(modal);
+            $('#modelInfoModal').modal('show');
+            
+            // Remove modal after hiding
+            $('#modelInfoModal').on('hidden.bs.modal', function() {
+                $(this).remove();
+            });
+        })
+        .fail(function() {
+            alert('Failed to load model information');
+        });
+}
+
+// Switch model
+function switchModel(modelType) {
+    $(`input[name="modelType"][value="${modelType}"]`).prop('checked', true);
+    
+    const modelName = modelType === 'sae' ? 'SAE (Stacked AutoEncoder)' : 'RBM (Restricted Boltzmann Machine)';
+    
+    // Show toast notification
+    const toast = $(`
+        <div class="toast align-items-center text-white bg-primary border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-${modelType === 'sae' ? 'brain' : 'network-wired'} me-2"></i>
+                    Switched to ${modelName}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `);
+    
+    $('#toastContainer').append(toast);
+    toast.toast('show');
+    
+    // Remove toast after it's hidden
+    toast.on('hidden.bs.toast', function() {
+        $(this).remove();
+    });
+}
+</script>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+{% endblock %}

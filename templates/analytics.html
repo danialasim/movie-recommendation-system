@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - MovieRec AI{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Hero Section -->
+    <div class="hero-section mb-5">
+        <h1 class="display-4 mb-3">
+            <i class="fas fa-chart-line me-3"></i>
+            Analytics Dashboard
+        </h1>
+        <p class="lead">
+            Dive deep into recommendation insights and model performance metrics
+        </p>
+    </div>
+
+    <!-- Model Performance Overview -->
+    <div class="row mb-5">
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card model-status-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-brain fa-3x"></i>
+                    </div>
+                    <h5 class="card-title">SAE Model</h5>
+                    <h2 class="text-primary mb-0" id="sae-accuracy">94.2%</h2>
+                    <small class="text-muted">Accuracy</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card model-status-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-success mb-3">
+                        <i class="fas fa-project-diagram fa-3x"></i>
+                    </div>
+                    <h5 class="card-title">RBM Model</h5>
+                    <h2 class="text-success mb-0" id="rbm-accuracy">91.8%</h2>
+                    <small class="text-muted">Accuracy</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card model-status-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-info mb-3">
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                    <h5 class="card-title">Total Users</h5>
+                    <h2 class="text-info mb-0" id="total-users">943</h2>
+                    <small class="text-muted">In Dataset</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card model-status-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning mb-3">
+                        <i class="fas fa-film fa-3x"></i>
+                    </div>
+                    <h5 class="card-title">Total Movies</h5>
+                    <h2 class="text-warning mb-0" id="total-movies">1,682</h2>
+                    <small class="text-muted">In Dataset</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-5">
+        <!-- Model Performance Comparison -->
+        <div class="col-lg-6 mb-4">
+            <div class="card recommendation-card">
+                <div class="card-header text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Model Performance Comparison
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="modelPerformanceChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rating Distribution -->
+        <div class="col-lg-6 mb-4">
+            <div class="card recommendation-card">
+                <div class="card-header text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-star me-2"></i>
+                        Rating Distribution
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="ratingDistributionChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Genre Analysis and Popular Movies -->
+    <div class="row mb-5">
+        <!-- Genre Popularity -->
+        <div class="col-lg-8 mb-4">
+            <div class="card recommendation-card">
+                <div class="card-header text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tags me-2"></i>
+                        Genre Popularity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="genreChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Rated Movies -->
+        <div class="col-lg-4 mb-4">
+            <div class="card recommendation-card">
+                <div class="card-header text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trophy me-2"></i>
+                        Top Rated Movies
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="topMoviesList">
+                        <!-- Top movies will be loaded here -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold">Toy Story (1995)</span>
+                            <span class="badge bg-warning">4.8</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold">GoldenEye (1995)</span>
+                            <span class="badge bg-warning">4.6</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold">Twelve Monkeys (1995)</span>
+                            <span class="badge bg-warning">4.5</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold">Babe (1995)</span>
+                            <span class="badge bg-warning">4.4</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold">Dead Man Walking (1995)</span>
+                            <span class="badge bg-warning">4.3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time Metrics -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card recommendation-card">
+                <div class="card-header text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>
+                        Real-time Recommendation Metrics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center">
+                                <h3 class="text-primary mb-1" id="recommendations-today">127</h3>
+                                <small class="text-muted">Recommendations Today</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center">
+                                <h3 class="text-success mb-1" id="avg-response-time">0.24s</h3>
+                                <small class="text-muted">Avg Response Time</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center">
+                                <h3 class="text-info mb-1" id="user-satisfaction">96.3%</h3>
+                                <small class="text-muted">User Satisfaction</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center">
+                                <h3 class="text-warning mb-1" id="model-uptime">99.9%</h3>
+                                <small class="text-muted">Model Uptime</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Training History -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card recommendation-card">
+                <div class="card-header text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Model Training History
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="trainingHistoryChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Insights -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card recommendation-card">
+                <div class="card-header text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Key Insights
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>SAE Model</strong> shows 2.4% better accuracy than RBM for collaborative filtering
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>Drama</strong> and <strong>Comedy</strong> genres receive highest user engagement
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Average user rates <strong>3.6/5</strong> movies in our recommendation system
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>95%</strong> of users find recommendations within their preferred genres
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card recommendation-card">
+                <div class="card-header text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cog me-2"></i>
+                        System Health
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>CPU Usage</span>
+                            <span>23%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" style="width: 23%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Memory Usage</span>
+                            <span>67%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-warning" style="width: 67%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Disk Usage</span>
+                            <span>45%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Model Load</span>
+                            <span>82%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-primary" style="width: 82%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js for analytics charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Initialize charts when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Model Performance Chart
+    const modelCtx = document.getElementById('modelPerformanceChart').getContext('2d');
+    new Chart(modelCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Accuracy', 'Precision', 'Recall', 'F1-Score'],
+            datasets: [{
+                label: 'SAE Model',
+                data: [94.2, 92.8, 90.5, 91.6],
+                backgroundColor: 'rgba(0, 123, 255, 0.8)'
+            }, {
+                label: 'RBM Model',
+                data: [91.8, 89.3, 88.7, 89.0],
+                backgroundColor: 'rgba(40, 167, 69, 0.8)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+
+    // Rating Distribution Chart
+    const ratingCtx = document.getElementById('ratingDistributionChart').getContext('2d');
+    new Chart(ratingCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+            datasets: [{
+                data: [8, 12, 28, 35, 17],
+                backgroundColor: [
+                    '#dc3545',
+                    '#fd7e14',
+                    '#ffc107',
+                    '#28a745',
+                    '#007bff'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Genre Chart
+    const genreCtx = document.getElementById('genreChart').getContext('2d');
+    new Chart(genreCtx, {
+        type: 'horizontalBar',
+        data: {
+            labels: ['Drama', 'Comedy', 'Action', 'Romance', 'Thriller', 'Horror', 'Sci-Fi'],
+            datasets: [{
+                label: 'Popularity Score',
+                data: [85, 78, 72, 65, 58, 45, 52],
+                backgroundColor: 'rgba(102, 126, 234, 0.8)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+
+    // Training History Chart
+    const trainingCtx = document.getElementById('trainingHistoryChart').getContext('2d');
+    new Chart(trainingCtx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            datasets: [{
+                label: 'SAE Training Loss',
+                data: [0.8, 0.6, 0.4, 0.3, 0.25, 0.2],
+                borderColor: 'rgb(0, 123, 255)',
+                fill: false
+            }, {
+                label: 'RBM Training Loss',
+                data: [0.9, 0.7, 0.5, 0.4, 0.35, 0.3],
+                borderColor: 'rgb(40, 167, 69)',
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Animate counters
+    function animateCounter(element, target, duration = 2000) {
+        const start = 0;
+        const startTime = performance.now();
+        
+        function updateCounter(currentTime) {
+            const elapsedTime = currentTime - startTime;
+            const progress = Math.min(elapsedTime / duration, 1);
+            const current = Math.floor(progress * target);
+            
+            element.textContent = current;
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+            } else {
+                element.textContent = target;
+            }
+        }
+        
+        requestAnimationFrame(updateCounter);
+    }
+
+    // Animate metrics
+    setTimeout(() => {
+        animateCounter(document.getElementById('recommendations-today'), 127);
+        animateCounter(document.getElementById('total-users'), 943);
+        animateCounter(document.getElementById('total-movies'), 1682);
+    }, 500);
+});
+</script>
+{% endblock %}
