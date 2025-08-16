@@ -1,0 +1,37 @@
+{
+  "data_path": "data",
+  "model_path": "models",
+  "dataset": "ml-100k",
+  "test_size": 0.2,
+  "random_seed": 42,
+  
+  "sae": {
+    "hidden_dims": [20, 10],
+    "dropout_rate": 0.2,
+    "activation": "sigmoid",
+    "learning_rate": 0.01,
+    "weight_decay": 0.5,
+    "batch_size": 128,
+    "num_epochs": 200,
+    "patience": 20
+  },
+  
+  "rbm": {
+    "n_hidden": 100,
+    "learning_rate": 0.01,
+    "cd_k": 10,
+    "batch_size": 100,
+    "num_epochs": 200,
+    "rating_threshold": 3.0
+  },
+  
+  "train_both_models": true,
+  "use_hyperparameter_optimization": false,
+  "n_trials": 50,
+  "early_stopping": true,
+  "save_best_model": true,
+  
+  "experiment_name": "movie_recommendation_experiment",
+  "mlflow_tracking_uri": null,
+  "dagshub_repo": null
+}

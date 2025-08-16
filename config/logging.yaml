@@ -1,0 +1,94 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  default:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+  detailed:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+  simple:
+    format: '%(levelname)s - %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: default
+    stream: ext://sys.stdout
+
+  training_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: logs/training/training.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+
+  evaluation_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: logs/evaluation/evaluation.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+
+  models_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: logs/models/models.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+
+  api_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: logs/api/api.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+
+  data_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: logs/data/data.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+
+loggers:
+  training:
+    level: DEBUG
+    handlers: [console, training_file]
+    propagate: False
+
+  evaluation:
+    level: DEBUG
+    handlers: [console, evaluation_file]
+    propagate: False
+
+  models:
+    level: DEBUG
+    handlers: [console, models_file]
+    propagate: False
+
+  api:
+    level: DEBUG
+    handlers: [console, api_file]
+    propagate: False
+
+  data:
+    level: DEBUG
+    handlers: [console, data_file]
+    propagate: False
+
+  __main__:
+    level: DEBUG
+    handlers: [console, evaluation_file]
+    propagate: False
+
+root:
+  level: INFO
+  handlers: [console]

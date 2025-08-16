@@ -1,0 +1,3 @@
+default_experiment: movie_recommendation
+registry_uri: file:./model_registry
+tracking_uri: file:./mlruns
