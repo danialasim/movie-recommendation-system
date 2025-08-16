@@ -1,0 +1,73 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Movie Recommendation API - Simple Test",
+    "description": "Simple test dashboard for movie recommendation API metrics",
+    "tags": ["test", "api", "movie-rec"],
+    "timezone": "browser",
+    "time": {
+      "from": "now-5m",
+      "to": "now"
+    },
+    "refresh": "5s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "API Requests Total",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(api_requests_total)",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "API Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(api_requests_total[1m])",
+            "refId": "A",
+            "legendFormat": "{{endpoint}} {{method}} {{status}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "yAxes": [
+          {
+            "label": "Requests/sec"
+          },
+          {}
+        ]
+      }
+    ],
+    "version": 1
+  }
+}
