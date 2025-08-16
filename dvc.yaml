@@ -1,0 +1,39 @@
+stages:
+  data_preprocessing:
+    cmd: python src/data/data_preprocessing.py
+    deps:
+    - data/raw/
+    - src/data/data_preprocessing.py
+    outs:
+    - data/preprocessed/
+    
+  train_sae:
+    cmd: python src/training/train.py --model sae
+    deps:
+    - data/preprocessed/
+    - src/training/train.py
+    - src/models/autoencoder_model.py
+    outs:
+    - models/autoencoder/
+    metrics:
+    - metrics/sae_metrics.json
+    
+  train_rbm:
+    cmd: python src/training/train.py --model rbm
+    deps:
+    - data/preprocessed/
+    - src/training/train.py
+    - src/models/rbm_model.py
+    outs:
+    - models/rbm/
+    metrics:
+    - metrics/rbm_metrics.json
+    
+  evaluate:
+    cmd: python src/training/evaluate.py
+    deps:
+    - models/autoencoder/
+    - models/rbm/
+    - src/training/evaluate.py
+    metrics:
+    - metrics/evaluation_results.json
